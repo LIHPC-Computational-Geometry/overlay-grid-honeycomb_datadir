@@ -1,0 +1,2 @@
+- `gmsh -1 filename.geo -o filename.msh`
+- `gmsh -1 filename.geo -o filename.vtk`
