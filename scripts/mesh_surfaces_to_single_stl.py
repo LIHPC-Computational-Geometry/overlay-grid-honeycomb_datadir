@@ -70,21 +70,26 @@ for dim, tag in surfaces:
     gmsh.model.mesh.clear()
 
 
-# ---- Write single output STL ----
-print(f"Writing combined STL: {stl_output}")
+# ---- Write a single combined ASCII STL ----
+print(f"Writing ASCII STL: {stl_output}")
 
-with open(stl_output, "wb") as f:
-    f.write(b" " * 80)  # STL header
-    f.write(struct.pack("<I", len(all_triangles)))
+with open(stl_output, "w") as f:
+    f.write("solid gmsh_export\n")
 
     for tri in all_triangles:
-        # Normal vector (not important)
-        f.write(struct.pack("<3f", 0.0, 0.0, 0.0))
+        # Dummy normal (0,0,0) — most tools recompute normals anyway
+        f.write("  facet normal 0.0 0.0 0.0\n")
+        f.write("    outer loop\n")
 
+        # Write 3 vertices (ALWAYS duplicated per triangle)
         for v in tri:
-            f.write(struct.pack("<3f", *v))
+            f.write(f"      vertex {v[0]} {v[1]} {v[2]}\n")
 
-        f.write(struct.pack("<H", 0))  # attribute count
+        f.write("    endloop\n")
+        f.write("  endfacet\n")
+
+    f.write("endsolid gmsh_export\n")
+
 
 print("Done.")
 gmsh.finalize()
